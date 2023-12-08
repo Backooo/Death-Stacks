@@ -3,7 +3,7 @@ module Board where  -- do NOT CHANGE export of module
 -- IMPORTS HERE
 -- Note: Imports allowed that DO NOT REQUIRE TO ANY CHANGES TO package.yaml, e.g.:
 --       import Data.Chars
-
+import Data.List.Split (splitOn)
 
 -- #############################################################################
 -- ############# GIVEN IMPLEMENTATION                           ################
@@ -38,7 +38,11 @@ instance Eq Cell where
 -- #############################################################################
 
 validateFEN :: String -> Bool
-validateFEN _ = True
+validateFEN str =
+  let isAllowed = (`elem` "rb,/")
+      rows = splitOn "/" str
+      correctCommas = all ((== 5) . length . filter (== ',')) rows
+  in not (not (all isAllowed str) || (length rows /= 6) || last str == '/' || not correctCommas)
 
 
 -- #############################################################################
@@ -48,7 +52,19 @@ validateFEN _ = True
 -- #############################################################################
 
 buildBoard :: String -> Board
-buildBoard _ = []
+buildBoard fen = 
+  if not (validateFEN fen)
+  then error "Invalid FEN string"
+  else let rows = splitOn "/" fen
+           buildRow row = map buildCell (splitOn "," row)
+           buildCell cell = case cell of
+            "" -> Empty
+            _  -> Stack $ map color cell
+           color c = case c of
+            'r' -> Red
+            'b' -> Blue
+            _   -> error "Invalid cell string"
+       in map buildRow rows
 
 
 -- #############################################################################
