@@ -38,6 +38,7 @@ instance Eq Cell where
 -- #############################################################################
 
 validateFEN :: String -> Bool
+-- von CoPilot Geschrieben
 validateFEN str =
   let isAllowed = (`elem` "rb,/")
       rows = splitOn "/" str
@@ -52,6 +53,7 @@ validateFEN str =
 -- #############################################################################
 
 buildBoard :: String -> Board
+-- von CoPilot Geschrieben
 buildBoard fen = 
   if not (validateFEN fen)
   then error "Invalid FEN string"
@@ -63,7 +65,6 @@ buildBoard fen =
            color c = case c of
             'r' -> Red
             'b' -> Blue
-            _   -> error "Invalid cell string"
        in map buildRow rows
 
 

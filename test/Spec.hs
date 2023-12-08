@@ -12,6 +12,7 @@ import Control.Exception
 
 
 main :: IO ()
+-- Fast alle Test Cases von CoPilot geschrieben
 main = hspec $ do
     describe "validateFEN function tests" $ do
         it "Test 1: 'rr,rr,rr,rr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,bb,bb,bb,bb,bb' should be valid" $ do
@@ -78,7 +79,8 @@ main = hspec $ do
         it "Test 1: builds an empty board" $ do
             let fen = ",,,,,/,,,,,/,,,,,/,,,,,/,,,,,/,,,,,"
             let expectedBoard = replicate 6 (replicate 6 Empty)
-            buildBoard fen `shouldBe` expectedBoard
+            buildBoard fen `shouldBe` expectedBoard        
+            
         it "Test 2: builds a board with one red cell" $ do
             let fen = "r,,,,,/,,,,,/,,,,,/,,,,,/,,,,,/,,,,,"
             let expectedBoard = (Stack [Red] : replicate 5 Empty) : replicate 5 (replicate 6 Empty)
@@ -176,8 +178,23 @@ main = hspec $ do
             evaluate (buildBoard fen) `shouldThrow` errorCall "Invalid FEN string"
 
         it "Test 20: String with stacks of sizes greater than 1" $ do
-            let fen = "rr,rr,rr,rr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,bb,bb,bb,bb,bb"
-            let expectedBoard = [replicate 6 (Stack [Red, Red])] ++
-                                replicate 4 (replicate 6 Empty) ++
-                                [replicate 6 (Stack [Blue, Blue])]
+            let fen = "rr,rrr,rrrr,rrrrr,rrrrrr,rrrrrrr/rb,rbb,rbbb,rbbbb,rbbbbb,rbbbbbb/rb,rbr,rbrb,rbrbr,rbrbrb,rbrbrbr/br,brb,brbr,brbrb,brbrbr,brbrbrb/br,brr,brrr,brrrr,brrrrr,brrrrrr/bb,bbb,bbbb,bbbbb,bbbbbb,bbbbbbb"
+            let expectedBoard = [[Stack (replicate 2 Red), Stack (replicate 3 Red), Stack (replicate 4 Red), Stack (replicate 5 Red), Stack (replicate 6 Red), Stack (replicate 7 Red)],
+                     [Stack [Red, Blue], Stack [Red, Blue, Blue], Stack [Red, Blue, Blue, Blue], Stack [Red, Blue, Blue, Blue, Blue], Stack [Red, Blue, Blue, Blue, Blue, Blue], Stack [Red, Blue, Blue, Blue, Blue, Blue, Blue]],
+                     [Stack [Red, Blue], Stack [Red, Blue, Red], Stack [Red, Blue, Red, Blue], Stack [Red, Blue, Red, Blue, Red], Stack [Red, Blue, Red, Blue, Red, Blue], Stack [Red, Blue, Red, Blue, Red, Blue, Red]],
+                     [Stack [Blue, Red], Stack [Blue, Red, Blue], Stack [Blue, Red, Blue, Red], Stack [Blue, Red, Blue, Red, Blue], Stack [Blue, Red, Blue, Red, Blue, Red], Stack [Blue, Red, Blue, Red, Blue, Red, Blue]],
+                     [Stack [Blue, Red], Stack [Blue, Red, Red], Stack [Blue, Red, Red, Red], Stack [Blue, Red, Red, Red, Red], Stack [Blue, Red, Red, Red, Red, Red], Stack [Blue, Red, Red, Red, Red, Red, Red]],
+                     [Stack (replicate 2 Blue), Stack (replicate 3 Blue), Stack (replicate 4 Blue), Stack (replicate 5 Blue), Stack (replicate 6 Blue), Stack (replicate 7 Blue)]]
             buildBoard fen `shouldBe` expectedBoard
+
+        it "Test 21: String with no Slashes" $ do
+            let fen = ",,,,,,,,,,,,,,,,,,,"
+            evaluate (buildBoard fen) `shouldThrow` errorCall "Invalid FEN string"
+
+        it "Test 22: String with no Commas" $ do
+            let fen = "     /      /      /      /      /     "
+            evaluate (buildBoard fen) `shouldThrow` errorCall "Invalid FEN string"
+        
+        it "Test 23: String with wrong colors" $ do
+            let fen = "a,b,c,d,e,f/g,h,i,j,k,l/m,n,o,p,q,r/s,t,u,v,w,x/y,z,1,2,3,4/5,6,7,8,9,0"
+            evaluate (buildBoard fen) `shouldThrow` errorCall "Invalid FEN string"
