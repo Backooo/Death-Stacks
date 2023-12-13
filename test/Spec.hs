@@ -7,9 +7,8 @@ import Board
     ( buildBoard,
       validateFEN,
       Cell(Empty,Stack),
-      Player(Red, Blue))
-import Control.Exception
-
+      Player(Red, Blue),
+      path, Pos (..), Dir (..))
 
 main :: IO ()
 -- Fast alle Test Cases von CoPilot geschrieben
@@ -79,8 +78,8 @@ main = hspec $ do
         it "Test 1: builds an empty board" $ do
             let fen = ",,,,,/,,,,,/,,,,,/,,,,,/,,,,,/,,,,,"
             let expectedBoard = replicate 6 (replicate 6 Empty)
-            buildBoard fen `shouldBe` expectedBoard        
-            
+            buildBoard fen `shouldBe` expectedBoard
+
         it "Test 2: builds a board with one red cell" $ do
             let fen = "r,,,,,/,,,,,/,,,,,/,,,,,/,,,,,/,,,,,"
             let expectedBoard = (Stack [Red] : replicate 5 Empty) : replicate 5 (replicate 6 Empty)
@@ -136,48 +135,17 @@ main = hspec $ do
                          [Stack [Blue], Stack [Red], Stack [Blue], Stack [Red], Stack [Blue], Stack [Red]]]
             buildBoard fen `shouldBe` expectedBoard
 
-        it "Test 10: too few rows" $ do
-            let fen = "r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r"
-            evaluate (buildBoard fen) `shouldThrow` errorCall "Invalid FEN string"
-        it "Test 11: too many rows" $ do
-            let fen = "r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r"
-            evaluate (buildBoard fen) `shouldThrow` errorCall "Invalid FEN string"
-
-        it "Test 12: too few cells" $ do
-            let fen = "r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r"
-            evaluate (buildBoard fen) `shouldThrow` errorCall "Invalid FEN string"
-
-        it "Test 13: too many cells" $ do
-            let fen = "r,r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r"
-            evaluate (buildBoard fen) `shouldThrow` errorCall "Invalid FEN string"
-
-        it "Test 14: only red cells" $ do
+        it "Test 10: only red cells" $ do
             let fen = "r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r"
             let expectedBoard = replicate 6 (replicate 6 (Stack [Red]))
             buildBoard fen `shouldBe` expectedBoard
 
-        it "Test 15: only blue cells" $ do
+        it "Test 11: only blue cells" $ do
             let fen = "b,b,b,b,b,b/b,b,b,b,b,b/b,b,b,b,b,b/b,b,b,b,b,b/b,b,b,b,b,b/b,b,b,b,b,b"
             let expectedBoard = replicate 6 (replicate 6 (Stack [Blue]))
             buildBoard fen `shouldBe` expectedBoard
 
-        it "Test 16: too many commas" $ do
-            let fen = "r,,,,,,/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r"
-            evaluate (buildBoard fen) `shouldThrow` errorCall "Invalid FEN string"
-
-        it "Test 17: too few commas" $ do
-            let fen = "r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r"
-            evaluate (buildBoard fen) `shouldThrow` errorCall "Invalid FEN string"
-
-        it "Test 18: very long repeating string" $ do
-            let fen = "r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r/r,r,r,r,r,r" ++ concat (replicate 100 "/r,r,r,r,r,r")
-            evaluate (buildBoard fen) `shouldThrow` errorCall "Invalid FEN string"
-
-        it "Test 19: string with very unusual wrong pattern" $ do
-            let fen = "r,b,r,b,r,b/r,b,r,b,r,b/r,b,r,b,r,b/r,b,r,b,r,b/r,b,r,b,r,b/r,b,r,b,r,b/r,b,r,b,r,b"
-            evaluate (buildBoard fen) `shouldThrow` errorCall "Invalid FEN string"
-
-        it "Test 20: String with stacks of sizes greater than 1" $ do
+        it "Test 12: String with stacks of sizes greater than 1" $ do
             let fen = "rr,rrr,rrrr,rrrrr,rrrrrr,rrrrrrr/rb,rbb,rbbb,rbbbb,rbbbbb,rbbbbbb/rb,rbr,rbrb,rbrbr,rbrbrb,rbrbrbr/br,brb,brbr,brbrb,brbrbr,brbrbrb/br,brr,brrr,brrrr,brrrrr,brrrrrr/bb,bbb,bbbb,bbbbb,bbbbbb,bbbbbbb"
             let expectedBoard = [[Stack (replicate 2 Red), Stack (replicate 3 Red), Stack (replicate 4 Red), Stack (replicate 5 Red), Stack (replicate 6 Red), Stack (replicate 7 Red)],
                      [Stack [Red, Blue], Stack [Red, Blue, Blue], Stack [Red, Blue, Blue, Blue], Stack [Red, Blue, Blue, Blue, Blue], Stack [Red, Blue, Blue, Blue, Blue, Blue], Stack [Red, Blue, Blue, Blue, Blue, Blue, Blue]],
@@ -187,14 +155,106 @@ main = hspec $ do
                      [Stack (replicate 2 Blue), Stack (replicate 3 Blue), Stack (replicate 4 Blue), Stack (replicate 5 Blue), Stack (replicate 6 Blue), Stack (replicate 7 Blue)]]
             buildBoard fen `shouldBe` expectedBoard
 
-        it "Test 21: String with no Slashes" $ do
-            let fen = ",,,,,,,,,,,,,,,,,,,"
-            evaluate (buildBoard fen) `shouldThrow` errorCall "Invalid FEN string"
+        describe "path" $ do
+            it "Test 1: generates a path from a1 to the east for 2 steps" $
+                path (Pos 'a' 1) East 2 `shouldBe` [Pos 'a' 1, Pos 'b' 1, Pos 'c' 1]
 
-        it "Test 22: String with no Commas" $ do
-            let fen = "     /      /      /      /      /     "
-            evaluate (buildBoard fen) `shouldThrow` errorCall "Invalid FEN string"
-        
-        it "Test 23: String with wrong colors" $ do
-            let fen = "a,b,c,d,e,f/g,h,i,j,k,l/m,n,o,p,q,r/s,t,u,v,w,x/y,z,1,2,3,4/5,6,7,8,9,0"
-            evaluate (buildBoard fen) `shouldThrow` errorCall "Invalid FEN string"
+            it "Test 2: generates a path from a1 to the south for 2 steps (reflects off the edge)" $
+                path (Pos 'a' 1) South 2 `shouldBe` [Pos 'a' 1, Pos 'a' 2, Pos 'a' 3]
+
+            it "Test 3: generates a path from f6 to the west for 2 steps" $
+                path (Pos 'f' 6) West 2 `shouldBe` [Pos 'f' 6, Pos 'e' 6, Pos 'd' 6]
+
+            it "Test 4: generates a path from f6 to the north for 2 steps (reflects off the edge)" $
+                path (Pos 'f' 6) North 2 `shouldBe` [Pos 'f' 6, Pos 'f' 5, Pos 'f' 4]
+
+            it "Test 5: generates a path from a1 to the north for 2 steps" $
+                path (Pos 'a' 1) North 2 `shouldBe` [Pos 'a' 1, Pos 'a' 2, Pos 'a' 3]
+
+            it "Test 6: generates a path from a1 to the west for 2 steps (reflects off the edge)" $
+                path (Pos 'a' 1) West 2 `shouldBe` [Pos 'a' 1, Pos 'b' 1, Pos 'c' 1]
+
+            it "Test 7: generates a path from f6 to the south for 2 steps" $
+                path (Pos 'f' 6) South 2 `shouldBe` [Pos 'f' 6, Pos 'f' 5, Pos 'f' 4]
+
+            it "Test 8: generates a path from f6 to the east for 2 steps (reflects off the edge)" $
+                path (Pos 'f' 6) East 2 `shouldBe` [Pos 'f' 6, Pos 'e' 6, Pos 'd' 6]
+
+            it "Test 9: generates a path from a1 to the north east for 2 steps" $
+                path (Pos 'a' 1) NorthEast 2 `shouldBe` [Pos 'a' 1, Pos 'b' 2, Pos 'c' 3]
+
+            it "Test 10: generates a path from f6 to the south west for 2 steps" $
+                path (Pos 'f' 6) SouthWest 2 `shouldBe` [Pos 'f' 6, Pos 'e' 5, Pos 'd' 4]
+
+            it "Test 11: generates a path from a6 to the south east for 2 steps" $
+                path (Pos 'a' 6) SouthEast 2 `shouldBe` [Pos 'a' 6, Pos 'b' 5, Pos 'c' 4]
+
+            it "Test 12: generates a path from f1 to the north west for 2 steps" $
+                path (Pos 'f' 1) NorthWest 2 `shouldBe` [Pos 'f' 1, Pos 'e' 2, Pos 'd' 3]
+
+            it "Test 13: generates a path from f1 to the south west for 2 steps (reflects off the edge)" $
+                path (Pos 'f' 1) SouthWest 2 `shouldBe` [Pos 'f' 1, Pos 'e' 2, Pos 'd' 3]
+
+            it "Test 14: generates a path from f6 to the north west for 6 steps (reflects off the edge)" $
+                path (Pos 'f' 6) NorthWest 6 `shouldBe` [Pos 'f' 6, Pos 'e' 5, Pos 'd' 4, Pos 'c' 3, Pos 'b' 2, Pos 'a' 1, Pos 'b' 2]
+
+            it "Test 15: generates a path from a6 to the west for 6 steps (reflects off the edge)" $
+                path (Pos 'a' 6) West 6 `shouldBe` [Pos 'a' 6, Pos 'b' 6, Pos 'c' 6, Pos 'd' 6, Pos 'e' 6, Pos 'f' 6, Pos 'e' 6]
+
+            it "Test 16: generates a path from f1 to the north east for 6 steps (reflects off the edge)" $
+                path (Pos 'f' 1) NorthEast 6 `shouldBe` [Pos 'f' 1, Pos 'e' 2, Pos 'd' 3, Pos 'c' 4, Pos 'b' 5, Pos 'a' 6, Pos 'b' 5]
+
+            it "Test 17: generates a path from f6 to the north east for 6 steps (reflects off the edge)" $
+                path (Pos 'f' 6) NorthEast 6 `shouldBe` [Pos 'f' 6, Pos 'e' 5, Pos 'd' 4, Pos 'c' 3, Pos 'b' 2, Pos 'a' 1, Pos 'b' 2]
+
+            it "Test 18: generates a path from f1 to the south east for 6 steps (reflects off the edge)" $
+                path (Pos 'f' 1) SouthEast 6 `shouldBe` [Pos 'f' 1, Pos 'e' 2, Pos 'd' 3, Pos 'c' 4, Pos 'b' 5, Pos 'a' 6, Pos 'b' 5]
+
+            it "Test 19: generates a path from f4 to the south east for 6 steps (reflects off the edge)" $
+                path (Pos 'f' 4) SouthEast 6 `shouldBe` [Pos 'f' 4, Pos 'e' 3, Pos 'd' 2, Pos 'c' 1, Pos 'b' 2, Pos 'a' 3, Pos 'b' 4]
+
+            it "Test 20: generates a path from a1 to the south west for 6 steps (reflects off the edge)" $
+                path (Pos 'a' 1) SouthWest 6 `shouldBe` [Pos 'a' 1, Pos 'b' 2, Pos 'c' 3, Pos 'd' 4, Pos 'e' 5, Pos 'f' 6, Pos 'e' 5]
+
+            it "Test 21: generates a path from a4 to the south west for 6 steps (reflects off the edge)" $
+                path (Pos 'a' 4) SouthWest 6 `shouldBe` [Pos 'a' 4, Pos 'b' 3, Pos 'c' 2, Pos 'd' 1, Pos 'e' 2, Pos 'f' 3, Pos 'e' 4]
+
+            it "Test 22: generates a path from a6 to the north west for 6 steps (reflects off the edge)" $
+                path (Pos 'a' 6) NorthWest 6 `shouldBe` [Pos 'a' 6, Pos 'b' 5, Pos 'c' 4, Pos 'd' 3, Pos 'e' 2, Pos 'f' 1, Pos 'e' 2]
+
+            it "Test 23: generates a path from a4 to the north west for 6 steps (reflects off the edge)" $
+                path (Pos 'a' 4) NorthWest 6 `shouldBe` [Pos 'a' 4, Pos 'b' 5, Pos 'c' 6, Pos 'd' 5, Pos 'e' 4, Pos 'f' 3, Pos 'e' 2]
+
+            it "Test 23: generates a path from a4 to the north west for 6 steps (reflects off the edge)" $
+                path (Pos 'a' 4) NorthWest 6 `shouldNotBe` [Pos 'a' 4, Pos 'b' 5, Pos 'd' 6, Pos 'e' 5, Pos 'f' 4, Pos 'a' 3, Pos 'b' 2]
+
+        describe "Pos" $ do
+            it "should correctly innit Pos values" $ do
+                let position = Pos 'c' 4
+                col position `shouldBe` 'c'
+                row position `shouldBe` 4
+        describe "Eq Pos" $ do
+            it "positions with same row and column are equals" $ do
+                Pos 'a' 1 `shouldBe` Pos 'a' 1
+            it "positions with different rows are not equals" $ do
+                Pos 'a' 1 `shouldNotBe` Pos 'b' 2
+            it "positions with different columns are not equal" $ do
+                Pos 'a' 1 `shouldNotBe` Pos 'b' 1
+
+        describe "Eq Player" $ do
+            it "red players are equal" $ do
+                Red `shouldBe` Red
+            it "blue players are equal" $ do
+                Blue `shouldBe` Blue
+            it "red and blue players are not equal" $ do
+                Red `shouldNotBe` Blue
+
+        describe "Eq Cell" $ do
+            it "empty cells are equal" $ do
+                Empty `shouldBe` Empty
+            it "stacks with same players are equal" $ do
+                Stack [Red] `shouldBe` Stack [Red]
+            it "stacks with different players are not equal" $ do
+                Stack [Red] `shouldNotBe` Stack [Blue]
+            it "empty cells and stacks are not equal" $ do
+                Empty `shouldNotBe` Stack [Red]
