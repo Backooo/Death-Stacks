@@ -73,7 +73,7 @@ buildBoard fen =
 -- #############################################################################
 
 path :: Pos -> Dir -> Int -> [Pos]
--- von CoPilot Geschrieben
+-- von CoPilot Geschrieben aber reflect und opposite von mir angepasst
 path startPos dir steps = map fst $ take (steps + 1) $ iterate moveReflect (startPos, dir)
   where
     moveReflect (pos, dir) = 

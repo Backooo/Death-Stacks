@@ -228,15 +228,17 @@ main = hspec $ do
             it "Test 23: generates a path from a4 to the north west for 6 steps (reflects off the edge)" $
                 path (Pos 'a' 4) NorthWest 6 `shouldNotBe` [Pos 'a' 4, Pos 'b' 5, Pos 'd' 6, Pos 'e' 5, Pos 'f' 4, Pos 'a' 3, Pos 'b' 2]
 
+
+-- Eq und Pos Unit Tests da Validation sonst nicht 100% erreicht
         describe "Pos" $ do
             it "should correctly innit Pos values" $ do
                 let position = Pos 'c' 4
                 col position `shouldBe` 'c'
                 row position `shouldBe` 4
         describe "Eq Pos" $ do
-            it "positions with same row and column are equals" $ do
+            it "positions with same row and column are equal" $ do
                 Pos 'a' 1 `shouldBe` Pos 'a' 1
-            it "positions with different rows are not equals" $ do
+            it "positions with different rows are not equal" $ do
                 Pos 'a' 1 `shouldNotBe` Pos 'b' 2
             it "positions with different columns are not equal" $ do
                 Pos 'a' 1 `shouldNotBe` Pos 'b' 1
