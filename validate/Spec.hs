@@ -14,6 +14,7 @@ import Board
       Cell(Empty,Stack),
       Player(Red, Blue),
       Pos(Pos), Dir (North))
+import Deathstacks ( playerWon, isValidMove, listMoves, Move(Move), possibleMoves )
 
 main :: IO ()
 main = hspec $ do
