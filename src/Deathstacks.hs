@@ -4,6 +4,7 @@ module Deathstacks where  -- do NOT CHANGE export of module
 -- Note: Imports allowed that DO NOT REQUIRE TO CHANGE package.yaml, e.g.:
 --       import Data.Char
 import Board
+import Data.List ( nub )
 
 
 -- #############################################################################
@@ -17,7 +18,7 @@ instance Show Move where
 
 instance Eq Move where
   (==) (Move (Pos sc1 sr1) (Pos tc1 tr1) r1) (Move (Pos sc2 sr2) (Pos tc2 tr2) r2) =
-      sc1 == sc2 && sr1 == sr2 && tc1 == tc2 && tr1 == tr2 && r1 == r2 
+      sc1 == sc2 && sr1 == sr2 && tc1 == tc2 && tr1 == tr2 && r1 == r2
 
 
 -- #############################################################################
@@ -27,7 +28,11 @@ instance Eq Move where
 -- #############################################################################
 
 playerWon :: Board -> Maybe Player
-playerWon _ = Just Red
+playerWon board =
+  let topPlayers = [ head players | Stack players <- concat board]
+    in case nub topPlayers of
+        [player] -> Just player
+        _        -> Nothing
 
 
 -- #############################################################################

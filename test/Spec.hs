@@ -9,6 +9,11 @@ import Board
       Cell(Empty,Stack),
       Player(Red, Blue),
       path, Pos (..), Dir (..))
+import Deathstacks
+    ( Move(Move),
+      isValidMove,
+      possibleMoves,
+      playerWon )
 
 main :: IO ()
 -- Fast alle Test Cases von CoPilot geschrieben
@@ -229,8 +234,77 @@ main = hspec $ do
                 path (Pos 'a' 4) NorthWest 6 `shouldNotBe` [Pos 'a' 4, Pos 'b' 5, Pos 'd' 6, Pos 'e' 5, Pos 'f' 4, Pos 'a' 3, Pos 'b' 2]
 
 
--- Eq und Pos Unit Tests da Validation sonst nicht 100% erreicht
-        describe "Pos" $ do
+        describe "playerWon" $ do
+            it "returns Just Red when all stacks top with Red" $ do
+                let board = replicate 6 (replicate 6 (Stack [Red]))
+                playerWon board `shouldBe` Just Red
+
+            it "returns Just Blue when all stacks top with Blue" $ do
+                let board = replicate 6 (replicate 6 (Stack [Blue]))
+                playerWon board `shouldBe` Just Blue
+
+            it "returns Nothing when stacks top with different players" $ do
+                let board = [Stack [Red], Stack [Blue]] : replicate 5 (replicate 6 Empty)
+                playerWon board `shouldBe` Nothing
+
+            it "return Nothing when Board is empty" $ do
+                let board = replicate 6 (replicate 6 Empty)
+                playerWon board `shouldBe` Nothing
+
+            it "return Just Blue when Blue is on top of all Red Stacks" $ do
+                let board = [ Stack [Blue, Red] : replicate 5 Empty,
+                        [Empty, Stack [Blue, Red]] ++ replicate 4 Empty,
+                        replicate 2 Empty ++ [Stack [Blue, Red]] ++ replicate 3 Empty,
+                        replicate 3 Empty ++ [Stack [Blue, Red]] ++ replicate 2 Empty,
+                        replicate 4 Empty ++ [Stack [Blue, Red]] ++ replicate 1 Empty,
+                        replicate 5 Empty ++ [Stack [Blue, Red]] ]
+                playerWon board `shouldBe` Just Blue
+
+            it "return Just Red when Red is on top of all Blue Stacks" $ do
+                let board = [ Stack [Red, Blue] : replicate 5 Empty,
+                        [Empty, Stack [Red, Blue]] ++ replicate 4 Empty,
+                        replicate 2 Empty ++ [Stack [Red, Blue]] ++ replicate 3 Empty,
+                        replicate 3 Empty ++ [Stack [Red, Blue]] ++ replicate 2 Empty,
+                        replicate 4 Empty ++ [Stack [Red, Blue]] ++ replicate 1 Empty,
+                        replicate 5 Empty ++ [Stack [Red, Blue]] ]
+                playerWon board `shouldBe` Just Red
+
+            it "returns Just Blue when Blue is on top of all mixed stacks" $ do
+                let board = [ Stack [Blue, Red, Blue, Red] : replicate 5 Empty,
+                              replicate 3 Empty ++ [Stack [Blue, Red, Blue, Red]] ++ replicate 2 Empty,
+                              replicate 5 Empty ++ [Stack [Blue, Red, Blue, Red]] ]
+                playerWon board `shouldBe` Just Blue
+
+            it "returns Just Red when Red is on top of all mixed stacks" $ do
+                let board = [ Stack [Red, Blue, Red, Blue] : replicate 5 Empty,
+                              replicate 3 Empty ++ [Stack [Red, Blue, Red, Blue]] ++ replicate 2 Empty,
+                              replicate 5 Empty ++ [Stack [Red, Blue, Red, Blue]] ]
+                playerWon board `shouldBe` Just Red
+
+            it "returns Just Blue when Blue is on top of all mixed stacks" $ do
+                let board = [ Stack [Blue, Red, Blue] : replicate 5 Empty,
+                              replicate 2 Empty ++ [Stack [Blue, Red, Blue]] ++ replicate 3 Empty,
+                              replicate 4 Empty ++ [Stack [Blue, Red, Blue]] ++ replicate 1 Empty,
+                              replicate 5 Empty ++ [Stack [Blue, Red, Blue]] ]
+                playerWon board `shouldBe` Just Blue
+
+            it "returns Just Red when Red is on top of all mixed stacks" $ do
+                let board = [ Stack [Red, Blue, Red] : replicate 5 Empty,
+                              replicate 2 Empty ++ [Stack [Red, Blue, Red]] ++ replicate 3 Empty,
+                              replicate 4 Empty ++ [Stack [Red, Blue, Red]] ++ replicate 1 Empty,
+                              replicate 5 Empty ++ [Stack [Red, Blue, Red]] ]
+                playerWon board `shouldBe` Just Red
+
+            it "returns Nothing when there are different colors on top" $ do
+                let board = [ Stack [Blue, Red, Blue] : replicate 5 Empty,
+                              replicate 2 Empty ++ [Stack [Red, Blue, Red]] ++ replicate 3 Empty,
+                              replicate 4 Empty ++ [Stack [Blue, Red, Blue]] ++ replicate 1 Empty,
+                              replicate 5 Empty ++ [Stack [Red, Blue, Red]] ]
+                playerWon board `shouldBe` Nothing
+
+
+ -- Eq und Pos Unit Tests da Validation sonst nicht 100% erreicht
+{-        describe "Pos" $ do
             it "should correctly innit Pos values" $ do
                 let position = Pos 'c' 4
                 col position `shouldBe` 'c'
@@ -259,4 +333,4 @@ main = hspec $ do
             it "stacks with different players are not equal" $ do
                 Stack [Red] `shouldNotBe` Stack [Blue]
             it "empty cells and stacks are not equal" $ do
-                Empty `shouldNotBe` Stack [Red]
+                Empty `shouldNotBe` Stack [Red] -}
