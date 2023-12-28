@@ -28,6 +28,7 @@ instance Eq Move where
 -- #############################################################################
 
 playerWon :: Board -> Maybe Player
+-- Von CoPilot geschrieben:
 playerWon board =
   let topPlayers = [ head players | Stack players <- concat board]
     in case nub topPlayers of
@@ -42,8 +43,11 @@ playerWon board =
 -- #############################################################################
 
 possibleMoves :: Pos -> Cell -> [Move]
-possibleMoves _ _ = []
-
+possibleMoves pos (Stack colors) = 
+  nub [Move pos endPos n | n <- [1..length colors], dir <- allDirections, let endPos = last $ path pos dir n, endPos /= pos]
+  where
+    allDirections = [North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest]
+possibleMoves _ Empty = []
 
 -- #############################################################################
 -- ################### isValidMove :: Board -> Move -> Bool ####################

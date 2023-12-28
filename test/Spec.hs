@@ -233,7 +233,6 @@ main = hspec $ do
             it "Test 23: generates a path from a4 to the north west for 6 steps (reflects off the edge)" $
                 path (Pos 'a' 4) NorthWest 6 `shouldNotBe` [Pos 'a' 4, Pos 'b' 5, Pos 'd' 6, Pos 'e' 5, Pos 'f' 4, Pos 'a' 3, Pos 'b' 2]
 
-
         describe "playerWon" $ do
             it "returns Just Red when all stacks top with Red" $ do
                 let board = replicate 6 (replicate 6 (Stack [Red]))
@@ -301,6 +300,74 @@ main = hspec $ do
                               replicate 4 Empty ++ [Stack [Blue, Red, Blue]] ++ replicate 1 Empty,
                               replicate 5 Empty ++ [Stack [Red, Blue, Red]] ]
                 playerWon board `shouldBe` Nothing
+
+        describe "possibleMoves" $ do
+            
+            {- it "returns correct moves in list for two piece stack on c4" $ do
+                possibleMoves (Pos 'c' 4) (Stack [Red, Blue]) `shouldMatchList` ([Move (Pos 'c' 4) (Pos 'c' 5) 1,Move (Pos 'c' 4) (Pos 'd' 5) 1,
+                    Move (Pos 'c' 4) (Pos 'd' 4) 1,Move (Pos 'c' 4) (Pos 'd' 3) 1,Move (Pos 'c' 4) (Pos 'c' 3) 1,
+                    Move (Pos 'c' 4) (Pos 'b' 3) 1,Move (Pos 'c' 4) (Pos 'b' 4) 1,Move (Pos 'c' 4) (Pos 'b' 5) 1, 
+                    Move (Pos 'c' 4) (Pos 'c' 6) 2, Move (Pos 'c' 4) (Pos 'e' 6) 2,Move (Pos 'c' 4) (Pos 'e' 4) 2, Move (Pos 'c' 4) (Pos 'e' 2) 2, Move (Pos 'c' 4) (Pos 'c' 2) 2,
+                    Move (Pos 'c' 4) (Pos 'a' 2) 2, Move (Pos 'c' 4) (Pos 'a' 4) 2, Move (Pos 'c' 4) (Pos 'a' 6) 2] :: [Move])
+
+            it "returns correct moves in list for three piece stack on c4" $ do
+                possibleMoves (Pos 'c' 4) (Stack [Blue, Red, Blue]) `shouldMatchList`
+                    ([Move (Pos 'c' 4) (Pos 'c' 5) 1,Move (Pos 'c' 4) (Pos 'd' 5) 1,Move (Pos 'c' 4) (Pos 'd' 4) 1,Move (Pos 'c' 4) (Pos 'd' 3) 1,
+                    Move (Pos 'c' 4) (Pos 'c' 3) 1, Move (Pos 'c' 4) (Pos 'b' 3) 1,Move (Pos 'c' 4) (Pos 'b' 4) 1,Move (Pos 'c' 4) (Pos 'b' 5) 1,
+                    Move (Pos 'c' 4) (Pos 'c' 6) 2, Move (Pos 'c' 4) (Pos 'e' 6) 2,Move (Pos 'c' 4) (Pos 'e' 4) 2, Move (Pos 'c' 4) (Pos 'e' 2) 2,
+                    Move (Pos 'c' 4) (Pos 'c' 2) 2, Move (Pos 'c' 4) (Pos 'a' 2) 2, Move (Pos 'c' 4) (Pos 'a' 4) 2, Move (Pos 'c' 4) (Pos 'a' 6) 2,
+                    Move (Pos 'c' 4) (Pos 'c' 5) 3, Move (Pos 'c' 4) (Pos 'f' 5) 3,Move (Pos 'c' 4) (Pos 'f' 4) 3, Move (Pos 'c' 4) (Pos 'f' 1) 3,
+                    Move (Pos 'c' 4) (Pos 'c' 1) 3, Move (Pos 'c' 4) (Pos 'b' 1) 3, Move (Pos 'c' 4) (Pos 'b' 4) 3, Move (Pos 'c' 4) (Pos 'b' 5) 3] :: [Move])
+
+            it "returns correct moves in list for three piece stack on a1" $ do
+                possibleMoves (Pos 'a' 1) (Stack [Red, Red]) `shouldMatchList`
+                    [Move (Pos 'a' 1) (Pos 'a' 2) 1, Move (Pos 'a' 1) (Pos 'b' 2) 1, Move (Pos 'a' 1) (Pos 'b' 1) 1,  
+                        Move (Pos 'a' 1) (Pos 'a' 3) 2, Move (Pos 'a' 1) (Pos 'c' 3) 2, Move (Pos 'a' 1) (Pos 'c' 1) 2]
+
+            -}
+
+            it "returns correct moves in list for five piece stack on f6" $ do
+                    possibleMoves (Pos 'f' 6) (Stack [Red, Blue, Blue, Red, Blue]) `shouldMatchList` 
+                            ([Move (Pos 'f' 6) (Pos 'f' 5) 1, Move (Pos 'f' 6) (Pos 'e' 5) 1, Move (Pos 'f' 6) (Pos 'e' 6) 1,
+                                Move (Pos 'f' 6) (Pos 'f' 4) 2, Move (Pos 'f' 6) (Pos 'd' 4) 2, Move (Pos 'f' 6) (Pos 'd' 6) 2,
+                                Move (Pos 'f' 6) (Pos 'f' 3) 3, Move (Pos 'f' 6) (Pos 'c' 3) 3, Move (Pos 'f' 6) (Pos 'c' 6) 3,
+                                Move (Pos 'f' 6) (Pos 'f' 2) 4, Move (Pos 'f' 6) (Pos 'b' 2) 4, Move (Pos 'f' 6) (Pos 'b' 6) 4,
+                                Move (Pos 'f' 6) (Pos 'f' 1) 5, Move (Pos 'f' 6) (Pos 'a' 1) 5, Move (Pos 'f' 6) (Pos 'a' 6) 5] :: [Move])
+
+            it "returns correct moves in a list for five piece stack on a6" $ do
+                possibleMoves (Pos 'a' 6) (Stack [Red, Blue , Blue, Red, Blue]) `shouldMatchList`
+                    ([Move (Pos 'a' 6) (Pos 'a' 5) 1, Move (Pos 'a' 6) (Pos 'b' 5) 1, Move (Pos 'a' 6) (Pos 'b' 6) 1,
+                        Move (Pos 'a' 6) (Pos 'a' 4) 2, Move (Pos 'a' 6) (Pos 'c' 4) 2, Move (Pos 'a' 6) (Pos 'c' 6) 2,
+                        Move (Pos 'a' 6) (Pos 'a' 3) 3, Move (Pos 'a' 6) (Pos 'd' 3) 3, Move (Pos 'a' 6) (Pos 'd' 6) 3,
+                        Move (Pos 'a' 6) (Pos 'a' 2) 4, Move (Pos 'a' 6) (Pos 'e' 2) 4, Move (Pos 'a' 6) (Pos 'e' 6) 4,
+                        Move (Pos 'a' 6) (Pos 'a' 1) 5, Move (Pos 'a' 6) (Pos 'f' 1) 5, Move (Pos 'a' 6) (Pos 'f' 6) 5] :: [Move])
+
+            it "returns correct moves in a list for five piece stack on f1" $ do
+                possibleMoves (Pos 'f' 1) (Stack [Red, Blue, Blue, Red, Blue]) `shouldMatchList`
+                    ([Move (Pos 'f' 1) (Pos 'f' 2) 1, Move (Pos 'f' 1) (Pos 'e' 2) 1, Move (Pos 'f' 1) (Pos 'e' 1) 1,
+                        Move (Pos 'f' 1) (Pos 'd' 1) 2, Move (Pos 'f' 1) (Pos 'd' 3) 2, Move (Pos 'f' 1) (Pos 'f' 3) 2,
+                        Move (Pos 'f' 1) (Pos 'c' 1) 3, Move (Pos 'f' 1) (Pos 'c' 4) 3, Move (Pos 'f' 1) (Pos 'f' 4) 3,
+                        Move (Pos 'f' 1) (Pos 'b' 1) 4, Move (Pos 'f' 1) (Pos 'b' 5) 4, Move (Pos 'f' 1) (Pos 'f' 5) 4,
+                        Move (Pos 'f' 1) (Pos 'a' 1) 5, Move (Pos 'f' 1) (Pos 'a' 6) 5, Move (Pos 'f' 1) (Pos 'f' 6) 5] :: [Move])
+
+            it "returns correct moves in a list for five piece stack on a1" $ do
+                possibleMoves (Pos 'a' 1) (Stack [Red, Blue, Blue, Red, Blue]) `shouldMatchList`
+                    ([Move (Pos 'a' 1) (Pos 'a' 2) 1, Move (Pos 'a' 1) (Pos 'b' 2) 1, Move (Pos 'a' 1) (Pos 'b' 1) 1,
+                        Move (Pos 'a' 1) (Pos 'a' 3) 2, Move (Pos 'a' 1) (Pos 'c' 3) 2, Move (Pos 'a' 1) (Pos 'c' 1) 2,
+                        Move (Pos 'a' 1) (Pos 'a' 4) 3, Move (Pos 'a' 1) (Pos 'd' 4) 3, Move (Pos 'a' 1) (Pos 'd' 1) 3,
+                        Move (Pos 'a' 1) (Pos 'a' 5) 4, Move (Pos 'a' 1) (Pos 'e' 5) 4, Move (Pos 'a' 1) (Pos 'e' 1) 4,
+                        Move (Pos 'a' 1) (Pos 'a' 6) 5, Move (Pos 'a' 1) (Pos 'f' 6) 5, Move (Pos 'a' 1) (Pos 'f' 1) 5] :: [Move])
+
+            it "returns Empty list for empty stack on a1" $ do
+                possibleMoves (Pos 'a' 1) Empty `shouldBe` []
+
+            it "returns correct list for moves with startPos == endPos" $ do
+                possibleMoves (Pos 'e' 5) (Stack [Red, Blue]) `shouldMatchList`
+                    ([Move (Pos 'e' 5) (Pos 'f' 6) 1, Move (Pos 'e' 5) (Pos 'e' 6) 1, Move (Pos 'e' 5) (Pos 'd' 6) 1, Move (Pos 'e' 5) (Pos 'd' 5) 1,
+                    Move (Pos 'e' 5) (Pos 'f' 5) 1, Move (Pos 'e' 5) (Pos 'd' 4) 1, Move (Pos 'e' 5) (Pos 'e' 4) 1, Move (Pos 'e' 5) (Pos 'f' 4) 1,
+                    Move (Pos 'e' 5) (Pos 'c' 5) 2, Move (Pos 'e' 5) (Pos 'e' 3) 2, Move (Pos 'e' 5) (Pos 'c' 3) 2] :: [Move])
+
+
 
 
  -- Eq und Pos Unit Tests da Validation sonst nicht 100% erreicht
