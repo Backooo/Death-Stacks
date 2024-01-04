@@ -13,10 +13,10 @@ import Deathstacks
     ( Move(Move),
       isValidMove,
       possibleMoves,
-      playerWon )
+      playerWon, listMoves, Move(start, target, steps) )
 
 main :: IO ()
--- Fast alle Test Cases von CoPilot geschrieben
+-- Fast alle Test Cases von CoPilot geschrieben aber von mir angepasst wegen falscher Logik
 main = hspec $ do
     describe "validateFEN function tests" $ do
         it "Test 1: 'rr,rr,rr,rr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,bb,bb,bb,bb,bb' should be valid" $ do
@@ -80,6 +80,7 @@ main = hspec $ do
             validateFEN ",/,/,/,/,/," `shouldBe` False
 
     describe "buildBoard" $ do
+    -- Diese Test-Cases wurden zuerst von ChatGPT/CoPilot geschrieben aber aufgrund falscher logik musste ich sie größtenteils anpassen
         it "Test 1: builds an empty board" $ do
             let fen = ",,,,,/,,,,,/,,,,,/,,,,,/,,,,,/,,,,,"
             let expectedBoard = replicate 6 (replicate 6 Empty)
@@ -161,6 +162,7 @@ main = hspec $ do
             buildBoard fen `shouldBe` expectedBoard
 
         describe "path" $ do
+        -- Diese Test-Cases wurden zuerst von ChatGPT/CoPilot geschrieben aber aufgrund falscher logik musste ich sie größtenteils anpassen
             it "Test 1: generates a path from a1 to the east for 2 steps" $
                 path (Pos 'a' 1) East 2 `shouldBe` [Pos 'a' 1, Pos 'b' 1, Pos 'c' 1]
 
@@ -233,7 +235,41 @@ main = hspec $ do
             it "Test 23: generates a path from a4 to the north west for 6 steps (reflects off the edge)" $
                 path (Pos 'a' 4) NorthWest 6 `shouldNotBe` [Pos 'a' 4, Pos 'b' 5, Pos 'd' 6, Pos 'e' 5, Pos 'f' 4, Pos 'a' 3, Pos 'b' 2]
 
+ -- Eq und Pos Unit Tests da Coverage sonst nicht 100% erreicht
+ -- Von ChatGPT geschrieben
+        describe "Pos" $ do
+            it "should correctly innit Pos values" $ do
+                let position = Pos 'c' 4
+                col position `shouldBe` 'c'
+                row position `shouldBe` 4
+        describe "Eq Pos" $ do
+            it "positions with same row and column are equal" $ do
+                Pos 'a' 1 `shouldBe` Pos 'a' 1
+            it "positions with different rows are not equal" $ do
+                Pos 'a' 1 `shouldNotBe` Pos 'b' 2
+            it "positions with different columns are not equal" $ do
+                Pos 'a' 1 `shouldNotBe` Pos 'b' 1
+
+        describe "Eq Player" $ do
+            it "red players are equal" $ do
+                Red `shouldBe` Red
+            it "blue players are equal" $ do
+                Blue `shouldBe` Blue
+            it "red and blue players are not equal" $ do
+                Red `shouldNotBe` Blue
+
+        describe "Eq Cell" $ do
+            it "empty cells are equal" $ do
+                Empty `shouldBe` Empty
+            it "stacks with same players are equal" $ do
+                Stack [Red] `shouldBe` Stack [Red]
+            it "stacks with different players are not equal" $ do
+                Stack [Red] `shouldNotBe` Stack [Blue]
+            it "empty cells and stacks are not equal" $ do
+                Empty `shouldNotBe` Stack [Red]
+
         describe "playerWon" $ do
+        -- Diese Test-Cases wurden zuerst von ChatGPT/CoPilot geschrieben aber aufgrund falscher logik musste ich sie an paar Stellen anpassen
             it "returns Just Red when all stacks top with Red" $ do
                 let board = replicate 6 (replicate 6 (Stack [Red]))
                 playerWon board `shouldBe` Just Red
@@ -301,33 +337,15 @@ main = hspec $ do
                               replicate 5 Empty ++ [Stack [Red, Blue, Red]] ]
                 playerWon board `shouldBe` Nothing
 
+            it "returns Just Blue when blue won on achievable board" $ do
+                let board = buildBoard "bbrr,,br,,,/,,,brr,,/b,,,,,/,,,brrr,b,/,,brrrb,,brb,/,,,,,b"
+                playerWon board `shouldBe` Just Blue
+
         describe "possibleMoves" $ do
-            
-            {- it "returns correct moves in list for two piece stack on c4" $ do
-                possibleMoves (Pos 'c' 4) (Stack [Red, Blue]) `shouldMatchList` ([Move (Pos 'c' 4) (Pos 'c' 5) 1,Move (Pos 'c' 4) (Pos 'd' 5) 1,
-                    Move (Pos 'c' 4) (Pos 'd' 4) 1,Move (Pos 'c' 4) (Pos 'd' 3) 1,Move (Pos 'c' 4) (Pos 'c' 3) 1,
-                    Move (Pos 'c' 4) (Pos 'b' 3) 1,Move (Pos 'c' 4) (Pos 'b' 4) 1,Move (Pos 'c' 4) (Pos 'b' 5) 1, 
-                    Move (Pos 'c' 4) (Pos 'c' 6) 2, Move (Pos 'c' 4) (Pos 'e' 6) 2,Move (Pos 'c' 4) (Pos 'e' 4) 2, Move (Pos 'c' 4) (Pos 'e' 2) 2, Move (Pos 'c' 4) (Pos 'c' 2) 2,
-                    Move (Pos 'c' 4) (Pos 'a' 2) 2, Move (Pos 'c' 4) (Pos 'a' 4) 2, Move (Pos 'c' 4) (Pos 'a' 6) 2] :: [Move])
 
-            it "returns correct moves in list for three piece stack on c4" $ do
-                possibleMoves (Pos 'c' 4) (Stack [Blue, Red, Blue]) `shouldMatchList`
-                    ([Move (Pos 'c' 4) (Pos 'c' 5) 1,Move (Pos 'c' 4) (Pos 'd' 5) 1,Move (Pos 'c' 4) (Pos 'd' 4) 1,Move (Pos 'c' 4) (Pos 'd' 3) 1,
-                    Move (Pos 'c' 4) (Pos 'c' 3) 1, Move (Pos 'c' 4) (Pos 'b' 3) 1,Move (Pos 'c' 4) (Pos 'b' 4) 1,Move (Pos 'c' 4) (Pos 'b' 5) 1,
-                    Move (Pos 'c' 4) (Pos 'c' 6) 2, Move (Pos 'c' 4) (Pos 'e' 6) 2,Move (Pos 'c' 4) (Pos 'e' 4) 2, Move (Pos 'c' 4) (Pos 'e' 2) 2,
-                    Move (Pos 'c' 4) (Pos 'c' 2) 2, Move (Pos 'c' 4) (Pos 'a' 2) 2, Move (Pos 'c' 4) (Pos 'a' 4) 2, Move (Pos 'c' 4) (Pos 'a' 6) 2,
-                    Move (Pos 'c' 4) (Pos 'c' 5) 3, Move (Pos 'c' 4) (Pos 'f' 5) 3,Move (Pos 'c' 4) (Pos 'f' 4) 3, Move (Pos 'c' 4) (Pos 'f' 1) 3,
-                    Move (Pos 'c' 4) (Pos 'c' 1) 3, Move (Pos 'c' 4) (Pos 'b' 1) 3, Move (Pos 'c' 4) (Pos 'b' 4) 3, Move (Pos 'c' 4) (Pos 'b' 5) 3] :: [Move])
-
-            it "returns correct moves in list for three piece stack on a1" $ do
-                possibleMoves (Pos 'a' 1) (Stack [Red, Red]) `shouldMatchList`
-                    [Move (Pos 'a' 1) (Pos 'a' 2) 1, Move (Pos 'a' 1) (Pos 'b' 2) 1, Move (Pos 'a' 1) (Pos 'b' 1) 1,  
-                        Move (Pos 'a' 1) (Pos 'a' 3) 2, Move (Pos 'a' 1) (Pos 'c' 3) 2, Move (Pos 'a' 1) (Pos 'c' 1) 2]
-
-            -}
-
+        -- -- Diese Test-Cases wurden größtenteils von mir geschrieben das KI-generierte sehr fehlerhaft waren
             it "returns correct moves in list for five piece stack on f6" $ do
-                    possibleMoves (Pos 'f' 6) (Stack [Red, Blue, Blue, Red, Blue]) `shouldMatchList` 
+                    possibleMoves (Pos 'f' 6) (Stack [Red, Blue, Blue, Red, Blue]) `shouldMatchList`
                             ([Move (Pos 'f' 6) (Pos 'f' 5) 1, Move (Pos 'f' 6) (Pos 'e' 5) 1, Move (Pos 'f' 6) (Pos 'e' 6) 1,
                                 Move (Pos 'f' 6) (Pos 'f' 4) 2, Move (Pos 'f' 6) (Pos 'd' 4) 2, Move (Pos 'f' 6) (Pos 'd' 6) 2,
                                 Move (Pos 'f' 6) (Pos 'f' 3) 3, Move (Pos 'f' 6) (Pos 'c' 3) 3, Move (Pos 'f' 6) (Pos 'c' 6) 3,
@@ -367,37 +385,139 @@ main = hspec $ do
                     Move (Pos 'e' 5) (Pos 'f' 5) 1, Move (Pos 'e' 5) (Pos 'd' 4) 1, Move (Pos 'e' 5) (Pos 'e' 4) 1, Move (Pos 'e' 5) (Pos 'f' 4) 1,
                     Move (Pos 'e' 5) (Pos 'c' 5) 2, Move (Pos 'e' 5) (Pos 'e' 3) 2, Move (Pos 'e' 5) (Pos 'c' 3) 2] :: [Move])
 
+            it "returns correct list for moves with same endPos but different amount of steps" $ do
+                possibleMoves (Pos 'b' 5) (Stack [Red,Blue,Red]) `shouldMatchList`
+                    ([Move (Pos 'b' 5) (Pos 'b' 6) 1, Move (Pos 'b' 5) (Pos 'c' 6) 1, Move (Pos 'b' 5) (Pos 'c' 5) 1, Move (Pos 'b' 5) (Pos 'c' 4) 1,
+                    Move (Pos 'b' 5) (Pos 'b' 4) 1, Move (Pos 'b' 5) (Pos 'a' 6) 1, Move (Pos 'b' 5) (Pos 'a' 5) 1, Move (Pos 'b' 5) (Pos 'a' 4) 1,
+                    Move (Pos 'b' 5) (Pos 'd' 5) 2, Move (Pos 'b' 5) (Pos 'd' 3) 2, Move (Pos 'b' 5) (Pos 'b' 3) 2,
+                    Move (Pos 'b' 5) (Pos 'c' 5) 3, Move (Pos 'b' 5) (Pos 'e' 5) 3, Move (Pos 'b' 5) (Pos 'e' 4) 3, Move (Pos 'b' 5) (Pos 'c' 4) 3,
+                    Move (Pos 'b' 5) (Pos 'c' 2) 3, Move (Pos 'b' 5) (Pos 'e' 2) 3, Move (Pos 'b' 5) (Pos 'b' 2) 3, Move (Pos 'b' 5) (Pos 'b' 4) 3] :: [Move])
+
+        describe "isValidMove" $ do
+
+        -- Diese Test-Cases wurden größtenteils von mir geschrieben das KI-generierte sehr fehlerhaft waren
+            it "returns True for given board state and move" $ do
+                let gameBoard = [[Empty,Empty,Empty,Empty,Stack [Blue,Blue,Blue,Blue],Empty],[Empty,Stack [Red,Red,Red,Red,Red,Red],Empty,Empty,Empty,Empty],
+                        [Empty,Empty,Empty,Empty,Empty,Empty],[Empty,Stack [Blue,Blue,Blue,Blue,Blue],Empty,Stack [Red,Red,Red,Red],Empty,Stack [Blue]],
+                        [Empty,Empty,Stack [Red,Blue,Blue,Red],Empty,Empty,Empty],[Empty,Empty,Empty,Empty,Empty,Empty]]
+                let move = Move (Pos 'b' 5) (Pos 'c' 5) 3
+                isValidMove gameBoard move `shouldBe` True
+
+            it "returns False for given board state and move" $ do
+                let gameBoard = [[Empty,Empty,Empty,Empty,Stack [Blue,Blue,Blue,Blue],Empty],[Empty,Stack [Red,Red,Red,Red,Red,Red],Empty,Empty,Empty,Empty],
+                        [Empty,Empty,Empty,Empty,Empty,Empty],[Empty,Stack [Blue,Blue,Blue,Blue,Blue],Empty,Stack [Red,Red,Red,Red],Empty,Stack [Blue]],
+                        [Empty,Empty,Stack [Red,Blue,Blue,Red],Empty,Empty,Empty],[Empty,Empty,Empty,Empty,Empty,Empty]]
+                let move = Move (Pos 'b' 5) (Pos 'c' 5) 1
+                isValidMove gameBoard move `shouldBe` False
+
+            it "returns False for given board state and move" $ do
+                let gameBoard = [[Empty,Empty,Empty,Empty,Stack [Blue,Blue,Blue,Blue],Empty],[Empty,Stack [Red,Red,Red,Red,Red,Red],Empty,Empty,Empty,Empty],
+                        [Empty,Empty,Empty,Empty,Empty,Empty],[Empty,Stack [Blue,Blue,Blue,Blue,Blue],Empty,Stack [Red,Red,Red,Red],Empty,Stack [Blue]],
+                        [Empty,Empty,Stack [Red,Blue,Blue,Red],Empty,Empty,Empty],[Empty,Empty,Empty,Empty,Empty,Empty]]
+                let move = Move (Pos 'd' 3) (Pos 'd' 4) 1
+                isValidMove gameBoard move `shouldBe` False
+
+            it "returns True for given initial board state and move" $ do
+                let gameBoard = buildBoard "rr,rr,rr,rr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,bb,bb,bb,bb,bb"
+                let move = Move (Pos 'a' 1) (Pos 'a' 3) 2
+                isValidMove gameBoard move `shouldBe` True
+
+            it "returns False for given board state and move" $ do
+                let gameBoard = buildBoard "rr,,,rrrrrr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,,,bbbbbb,bb,bb"
+                let move = Move (Pos 'a' 1) (Pos 'a' 3) 2
+                isValidMove gameBoard move `shouldBe` False
+
+            it "returns False for given board state and move" $ do
+                let gameBoard = buildBoard "rr,,,rrrrrr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,,,bbbbbb,bb,bb"
+                let move = Move (Pos 'd' 1) (Pos 'd' 2) 1
+                isValidMove gameBoard move `shouldBe` False
+
+            it "returns True for given initial board state and move" $ do
+                let gameBoard = buildBoard "rr,rr,rr,rr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,bb,bb,bb,bb,bb"
+                let move = Move (Pos 'a' 6) (Pos 'a' 4) 2
+                isValidMove gameBoard move `shouldBe` True
+
+            it "returns False for given board state and move" $ do
+                let gameBoard = buildBoard "rr,,,rrrrrr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,,,bbbbbb,bb,bb"
+                let move = Move (Pos 'f' 1) (Pos 'f' 4) 2
+                isValidMove gameBoard move `shouldBe` False
+
+            it "returns False for given board state and move" $ do
+                let gameBoard = buildBoard "rr,,,rrrrrr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,,,bbbbbb,bb,bb"
+                let move = Move (Pos 'd' 6) (Pos 'd' 5) 1
+                isValidMove gameBoard move `shouldBe` False
+
+            it "returns False for given board state and move" $ do
+                let gameBoard = buildBoard "rr,,,rrrr,,rrrrrr/,,,,,/,,,,,/,,,,,/,,,,,/,,,bbbbbb,,bbbbbb"
+                let move = Move (Pos 'a' 1) (Pos 'a' 2) 1
+                isValidMove gameBoard move `shouldBe` False
+
+            it "returns False for a valid move when a too-tall stack of the same color exists" $ do
+                let gameBoard = buildBoard "rr,rr,rr,rr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,bb,bb,bb,bb,rrrrr"
+                let move = Move (Pos 'f' 6) (Pos 'f' 5) 1
+                isValidMove gameBoard move `shouldBe` False
+
+            it "returns True for a valid move when moving a too-tall stack to reflect off the wall" $ do
+                let gameBoard = buildBoard ",,,,bbbb,/,rrrrrr,,,,/,,,,,/,bbbbb,,rrrr,,b/,,rbbr,,,/,,,,,"
+                let move = Move (Pos 'b' 5) (Pos 'c' 5) 3
+                isValidMove gameBoard move `shouldBe` True
+
+            it "returns False for a valid move when moving a stack <= 4 and another stack > 4 exists" $ do
+                let gameBoard = buildBoard ",,,,bbbb,/,rrrrrr,,,,/,,,,,/,bbbbb,,rrrr,,b/,,rbbr,,,/,,,,,"
+                let move = Move (Pos 'd' 3) (Pos 'd' 4) 1
+                isValidMove gameBoard move `shouldBe` False
+
+            it "returns True for a valid move when moving a stack <= 4 on red when >4 exists on blue" $ do
+                let gameBoard = buildBoard "rr,,rr,rrrr,rrr,r/,,,,,/,,,,,/,,,,,/,,,,,/,bbbbb,b,bb,bb,bb"
+                let move = Move (Pos 'c' 6) (Pos 'd' 6) 1
+                isValidMove gameBoard move `shouldBe` True
+
+            it "returns True for a valid move when moving a stack <= 4 on red when >4 exists on blue" $ do
+                let gameBoard = buildBoard "rr,,r,rrrr,rrr,r/,,r,,,/,,,,,/,,,,,/,b,,,,/,bbbb,b,bb,bb,bb"
+                let move = Move (Pos 'c' 6) (Pos 'd' 6) 1
+                isValidMove gameBoard move `shouldBe` True
+
+        describe "listMoves" $ do
+
+        -- Diese Test-Cases wurden größtenteils von mir geschrieben das KI-generierte sehr fehlerhaft waren
+
+            it "returns no Moves for Red because Blue won in given board state" $ do
+                let gameBoard = buildBoard "brr,brr,brr,brr,brr,brr/,,,,,/,,,,,/,,,,,/,,,,,/b,b,b,b,b,b"
+                listMoves gameBoard Red `shouldBe` []
+
+            it "returns all Moves for Red for given board state" $ do
+                let gameBoard = buildBoard ",,,,,/,,,,,/,,,,,/,,,,,/,,,,,/bb,r,bb,bb,bb,bb"
+                let moves = ([Move (Pos 'b' 1) (Pos 'b' 2) 1,Move (Pos 'b' 1) (Pos 'c' 2) 1,Move (Pos 'b' 1) (Pos 'c' 1) 1,Move (Pos 'b' 1) (Pos 'a' 2) 1,Move (Pos 'b' 1) (Pos 'a' 1) 1] :: [Move])
+                listMoves gameBoard Red `shouldMatchList` moves
+
+            it "returns all Moves for Blue for given board state" $ do
+                let gameBoard = buildBoard "rr,b,rr,rr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/,,,,,"
+                let moves = ([Move (Pos 'b' 6) (Pos 'a' 6) 1, Move (Pos 'b' 6) (Pos 'a' 5) 1, Move (Pos 'b' 6) (Pos 'b' 5) 1, Move (Pos 'b' 6) (Pos 'c' 5) 1, Move (Pos 'b' 6) (Pos 'c' 6) 1] :: [Move])
+                listMoves gameBoard Blue `shouldMatchList` moves
+
+            it "returns no Moves for Red because Blue won in given board state" $ do
+                let gameBoard = buildBoard "bbrr,,br,,,/,,,brr,,/b,,,,,/,,,brrr,b,/,,brrrb,,brb,/,,,,,b"
+                listMoves gameBoard Red `shouldBe` []
+
+            it "returns no Moves for Red because Blue won in given board state" $ do
+                let gameBoard = buildBoard ",,,,,/,,,,,/brr,br,brr,brr,brr,brr/b,b,brb,,b,b/,,,,,/,,,,,"
+                listMoves gameBoard Red `shouldMatchList` []
+
+            it "returns no Moves for Blue because Blue won in given board state" $ do
+                let gameBoard = buildBoard ",,,,,/,,,,,/brr,br,brr,brr,brr,brr/b,b,brb,,b,b/,,,,,/,,,,,"
+                listMoves gameBoard Red `shouldMatchList` []
 
 
+        -- Test Cases von ChatGPT geschrieben
+        describe "show for Move" $ do
+            it "returns correct string representation for Move" $ do
+                show (Move (Pos 'a' 1) (Pos 'b' 2) 3) `shouldBe` "a1-3-b2"
+                show (Move (Pos 'c' 3) (Pos 'd' 4) 1) `shouldBe` "c3-1-d4"
+                show (Move (Pos 'e' 5) (Pos 'f' 6) 2) `shouldBe` "e5-2-f6"
 
- -- Eq und Pos Unit Tests da Validation sonst nicht 100% erreicht
-{-        describe "Pos" $ do
-            it "should correctly innit Pos values" $ do
-                let position = Pos 'c' 4
-                col position `shouldBe` 'c'
-                row position `shouldBe` 4
-        describe "Eq Pos" $ do
-            it "positions with same row and column are equal" $ do
-                Pos 'a' 1 `shouldBe` Pos 'a' 1
-            it "positions with different rows are not equal" $ do
-                Pos 'a' 1 `shouldNotBe` Pos 'b' 2
-            it "positions with different columns are not equal" $ do
-                Pos 'a' 1 `shouldNotBe` Pos 'b' 1
-
-        describe "Eq Player" $ do
-            it "red players are equal" $ do
-                Red `shouldBe` Red
-            it "blue players are equal" $ do
-                Blue `shouldBe` Blue
-            it "red and blue players are not equal" $ do
-                Red `shouldNotBe` Blue
-
-        describe "Eq Cell" $ do
-            it "empty cells are equal" $ do
-                Empty `shouldBe` Empty
-            it "stacks with same players are equal" $ do
-                Stack [Red] `shouldBe` Stack [Red]
-            it "stacks with different players are not equal" $ do
-                Stack [Red] `shouldNotBe` Stack [Blue]
-            it "empty cells and stacks are not equal" $ do
-                Empty `shouldNotBe` Stack [Red] -}
+        describe "Move data type" $ do
+            it "correctly stores start, target and steps" $ do
+                let move = Move (Pos 'a' 1) (Pos 'b' 2) 3
+                start move `shouldBe` Pos 'a' 1
+                target move `shouldBe` Pos 'b' 2
+                steps move `shouldBe` 3
