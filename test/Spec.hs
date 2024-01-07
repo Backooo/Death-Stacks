@@ -507,6 +507,72 @@ main = hspec $ do
                 let gameBoard = buildBoard ",,,,,/,,,,,/brr,br,brr,brr,brr,brr/b,b,brb,,b,b/,,,,,/,,,,,"
                 listMoves gameBoard Red `shouldMatchList` []
 
+            it "returns all Moves for Red in given board state" $ do
+                let gameBoard = buildBoard ",,,,,/,rrrr,,,rrrr,/,,rr,rr,,/,,bb,bb,,/,bbbb,,,bbbb,/,,,,,"
+                listMoves gameBoard Red `shouldMatchList` ([
+                    Move (Pos 'b' 5) (Pos 'b' 6) 1, Move (Pos 'b' 5) (Pos 'c' 6) 1, Move (Pos 'b' 5) (Pos 'c' 5) 1,
+                    Move (Pos 'b' 5) (Pos 'c' 4) 1, Move (Pos 'b' 5) (Pos 'b' 4) 1, Move (Pos 'b' 5) (Pos 'a' 4) 1,
+                    Move (Pos 'b' 5) (Pos 'a' 5) 1, Move (Pos 'b' 5) (Pos 'a' 6) 1, Move (Pos 'b' 5) (Pos 'd' 5) 2,
+                    Move (Pos 'b' 5) (Pos 'd' 3) 2, Move (Pos 'b' 5) (Pos 'b' 3) 2, Move (Pos 'b' 5) (Pos 'b' 4) 3,
+                    Move (Pos 'b' 5) (Pos 'e' 4) 3, Move (Pos 'b' 5) (Pos 'e' 5) 3, Move (Pos 'b' 5) (Pos 'e' 2) 3,
+                    Move (Pos 'b' 5) (Pos 'b' 2) 3, Move (Pos 'b' 5) (Pos 'c' 2) 3, Move (Pos 'b' 5) (Pos 'c' 5) 3,
+                    Move (Pos 'b' 5) (Pos 'c' 4) 3, Move (Pos 'b' 5) (Pos 'b' 3) 4, Move (Pos 'b' 5) (Pos 'f' 3) 4,
+                    Move (Pos 'b' 5) (Pos 'f' 5) 4, Move (Pos 'b' 5) (Pos 'f' 1) 4, Move (Pos 'b' 5) (Pos 'b' 1) 4,
+                    Move (Pos 'b' 5) (Pos 'd' 1) 4, Move (Pos 'b' 5) (Pos 'd' 5) 4, Move (Pos 'b' 5) (Pos 'd' 3) 4,
+                    Move (Pos 'e' 5) (Pos 'e' 6) 1, Move (Pos 'e' 5) (Pos 'f' 6) 1, Move (Pos 'e' 5) (Pos 'f' 5) 1,
+                    Move (Pos 'e' 5) (Pos 'f' 4) 1, Move (Pos 'e' 5) (Pos 'e' 4) 1, Move (Pos 'e' 5) (Pos 'd' 4) 1,
+                    Move (Pos 'e' 5) (Pos 'd' 5) 1, Move (Pos 'e' 5) (Pos 'd' 6) 1, Move (Pos 'e' 5) (Pos 'e' 3) 2,
+                    Move (Pos 'e' 5) (Pos 'c' 3) 2, Move (Pos 'e' 5) (Pos 'c' 5) 2, Move (Pos 'e' 5) (Pos 'e' 4) 3,
+                    Move (Pos 'e' 5) (Pos 'd' 4) 3, Move (Pos 'e' 5) (Pos 'd' 5) 3, Move (Pos 'e' 5) (Pos 'd' 2) 3,
+                    Move (Pos 'e' 5) (Pos 'e' 2) 3, Move (Pos 'e' 5) (Pos 'b' 2) 3, Move (Pos 'e' 5) (Pos 'b' 5) 3,
+                    Move (Pos 'e' 5) (Pos 'b' 4) 3, Move (Pos 'e' 5) (Pos 'e' 3) 4, Move (Pos 'e' 5) (Pos 'c' 3) 4,
+                    Move (Pos 'e' 5) (Pos 'c' 5) 4, Move (Pos 'e' 5) (Pos 'c' 1) 4, Move (Pos 'e' 5) (Pos 'e' 1) 4,
+                    Move (Pos 'e' 5) (Pos 'a' 1) 4, Move (Pos 'e' 5) (Pos 'a' 5) 4, Move (Pos 'e' 5) (Pos 'a' 3) 4,
+                    Move (Pos 'c' 4) (Pos 'c' 5) 1, Move (Pos 'c' 4) (Pos 'd' 5) 1, Move (Pos 'c' 4) (Pos 'd' 4) 1,
+                    Move (Pos 'c' 4) (Pos 'd' 3) 1, Move (Pos 'c' 4) (Pos 'c' 3) 1, Move (Pos 'c' 4) (Pos 'b' 3) 1,
+                    Move (Pos 'c' 4) (Pos 'b' 4) 1, Move (Pos 'c' 4) (Pos 'b' 5) 1, Move (Pos 'c' 4) (Pos 'c' 6) 2,
+                    Move (Pos 'c' 4) (Pos 'e' 6) 2, Move (Pos 'c' 4) (Pos 'e' 4) 2, Move (Pos 'c' 4) (Pos 'e' 2) 2,
+                    Move (Pos 'c' 4) (Pos 'c' 2) 2, Move (Pos 'c' 4) (Pos 'a' 2) 2, Move (Pos 'c' 4) (Pos 'a' 4) 2,
+                    Move (Pos 'c' 4) (Pos 'a' 6) 2, Move (Pos 'd' 4) (Pos 'd' 5) 1, Move (Pos 'd' 4) (Pos 'e' 5) 1,
+                    Move (Pos 'd' 4) (Pos 'e' 4) 1, Move (Pos 'd' 4) (Pos 'e' 3) 1, Move (Pos 'd' 4) (Pos 'd' 3) 1,
+                    Move (Pos 'd' 4) (Pos 'c' 3) 1, Move (Pos 'd' 4) (Pos 'c' 4) 1, Move (Pos 'd' 4) (Pos 'c' 5) 1,
+                    Move (Pos 'd' 4) (Pos 'd' 6) 2, Move (Pos 'd' 4) (Pos 'f' 6) 2, Move (Pos 'd' 4) (Pos 'f' 4) 2,
+                    Move (Pos 'd' 4) (Pos 'f' 2) 2, Move (Pos 'd' 4) (Pos 'd' 2) 2, Move (Pos 'd' 4) (Pos 'b' 2) 2,
+                    Move (Pos 'd' 4) (Pos 'b' 4) 2, Move (Pos 'd' 4) (Pos 'b' 6) 2] :: [Move])
+
+            it "returns all Moves for Blue in given board state" $ do
+                let gameBoard = buildBoard ",,,,,/,rrrr,,,rrrr,/,,rr,rr,,/,,bb,bb,,/,bbbb,,,bbbb,/,,,,,"
+                listMoves gameBoard Blue `shouldMatchList` ([
+                    Move (Pos 'c' 3) (Pos 'c' 4) 1, Move (Pos 'c' 3) (Pos 'd' 4) 1, Move (Pos 'c' 3) (Pos 'd' 3) 1,
+                    Move (Pos 'c' 3) (Pos 'd' 2) 1, Move (Pos 'c' 3) (Pos 'c' 2) 1, Move (Pos 'c' 3) (Pos 'b' 2) 1,
+                    Move (Pos 'c' 3) (Pos 'b' 3) 1, Move (Pos 'c' 3) (Pos 'b' 4) 1, Move (Pos 'c' 3) (Pos 'c' 5) 2,
+                    Move (Pos 'c' 3) (Pos 'e' 5) 2, Move (Pos 'c' 3) (Pos 'e' 3) 2, Move (Pos 'c' 3) (Pos 'e' 1) 2,
+                    Move (Pos 'c' 3) (Pos 'c' 1) 2, Move (Pos 'c' 3) (Pos 'a' 1) 2, Move (Pos 'c' 3) (Pos 'a' 3) 2,
+                    Move (Pos 'c' 3) (Pos 'a' 5) 2, Move (Pos 'd' 3) (Pos 'd' 4) 1, Move (Pos 'd' 3) (Pos 'e' 4) 1,
+                    Move (Pos 'd' 3) (Pos 'e' 3) 1, Move (Pos 'd' 3) (Pos 'e' 2) 1, Move (Pos 'd' 3) (Pos 'd' 2) 1,
+                    Move (Pos 'd' 3) (Pos 'c' 2) 1, Move (Pos 'd' 3) (Pos 'c' 3) 1, Move (Pos 'd' 3) (Pos 'c' 4) 1,
+                    Move (Pos 'd' 3) (Pos 'd' 5) 2, Move (Pos 'd' 3) (Pos 'f' 5) 2, Move (Pos 'd' 3) (Pos 'f' 3) 2,
+                    Move (Pos 'd' 3) (Pos 'f' 1) 2, Move (Pos 'd' 3) (Pos 'd' 1) 2, Move (Pos 'd' 3) (Pos 'b' 1) 2,
+                    Move (Pos 'd' 3) (Pos 'b' 3) 2, Move (Pos 'd' 3) (Pos 'b' 5) 2, Move (Pos 'b' 2) (Pos 'b' 3) 1,
+                    Move (Pos 'b' 2) (Pos 'c' 3) 1, Move (Pos 'b' 2) (Pos 'c' 2) 1, Move (Pos 'b' 2) (Pos 'c' 1) 1,
+                    Move (Pos 'b' 2) (Pos 'b' 1) 1, Move (Pos 'b' 2) (Pos 'a' 1) 1, Move (Pos 'b' 2) (Pos 'a' 2) 1,
+                    Move (Pos 'b' 2) (Pos 'a' 3) 1, Move (Pos 'b' 2) (Pos 'b' 4) 2, Move (Pos 'b' 2) (Pos 'd' 4) 2,
+                    Move (Pos 'b' 2) (Pos 'd' 2) 2, Move (Pos 'b' 2) (Pos 'b' 5) 3, Move (Pos 'b' 2) (Pos 'e' 5) 3,
+                    Move (Pos 'b' 2) (Pos 'e' 2) 3, Move (Pos 'b' 2) (Pos 'e' 3) 3, Move (Pos 'b' 2) (Pos 'b' 3) 3,
+                    Move (Pos 'b' 2) (Pos 'c' 3) 3, Move (Pos 'b' 2) (Pos 'c' 2) 3, Move (Pos 'b' 2) (Pos 'c' 5) 3,
+                    Move (Pos 'b' 2) (Pos 'b' 6) 4, Move (Pos 'b' 2) (Pos 'f' 6) 4, Move (Pos 'b' 2) (Pos 'f' 2) 4,
+                    Move (Pos 'b' 2) (Pos 'f' 4) 4, Move (Pos 'b' 2) (Pos 'b' 4) 4, Move (Pos 'b' 2) (Pos 'd' 4) 4,
+                    Move (Pos 'b' 2) (Pos 'd' 2) 4, Move (Pos 'b' 2) (Pos 'd' 6) 4, Move (Pos 'e' 2) (Pos 'e' 3) 1,
+                    Move (Pos 'e' 2) (Pos 'f' 3) 1, Move (Pos 'e' 2) (Pos 'f' 2) 1, Move (Pos 'e' 2) (Pos 'f' 1) 1,
+                    Move (Pos 'e' 2) (Pos 'e' 1) 1, Move (Pos 'e' 2) (Pos 'd' 1) 1, Move (Pos 'e' 2) (Pos 'd' 2) 1,
+                    Move (Pos 'e' 2) (Pos 'd' 3) 1, Move (Pos 'e' 2) (Pos 'e' 4) 2, Move (Pos 'e' 2) (Pos 'c' 2) 2,
+                    Move (Pos 'e' 2) (Pos 'c' 4) 2, Move (Pos 'e' 2) (Pos 'e' 5) 3, Move (Pos 'e' 2) (Pos 'd' 5) 3,
+                    Move (Pos 'e' 2) (Pos 'd' 2) 3, Move (Pos 'e' 2) (Pos 'd' 3) 3, Move (Pos 'e' 2) (Pos 'e' 3) 3,
+                    Move (Pos 'e' 2) (Pos 'b' 3) 3, Move (Pos 'e' 2) (Pos 'b' 2) 3, Move (Pos 'e' 2) (Pos 'b' 5) 3,
+                    Move (Pos 'e' 2) (Pos 'e' 6) 4, Move (Pos 'e' 2) (Pos 'c' 6) 4, Move (Pos 'e' 2) (Pos 'c' 2) 4,
+                    Move (Pos 'e' 2) (Pos 'c' 4) 4, Move (Pos 'e' 2) (Pos 'e' 4) 4, Move (Pos 'e' 2) (Pos 'a' 4) 4,
+                    Move (Pos 'e' 2) (Pos 'a' 2) 4, Move (Pos 'e' 2) (Pos 'a' 6) 4] :: [Move]) 
+
 
         -- Test Cases von ChatGPT geschrieben
         describe "show for Move" $ do
