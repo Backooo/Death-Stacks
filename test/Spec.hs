@@ -1,7 +1,3 @@
--- #############################################################################
--- ####### YOUR UNIT TESTS                                           ###########
--- ####### Note: execute tests using "stack test deathstacks:units"  ###########
--- #############################################################################
 import Test.Hspec
 import Board
     ( buildBoard,
@@ -16,7 +12,6 @@ import Deathstacks
       playerWon, listMoves, Move(start, target, steps) )
 
 main :: IO ()
--- Fast alle Test Cases von CoPilot geschrieben aber von mir angepasst wegen falscher Logik
 main = hspec $ do
     describe "validateFEN function tests" $ do
         it "Test 1: 'rr,rr,rr,rr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,bb,bb,bb,bb,bb' should be valid" $ do
@@ -80,7 +75,6 @@ main = hspec $ do
             validateFEN ",/,/,/,/,/," `shouldBe` False
 
     describe "buildBoard" $ do
-    -- Diese Test-Cases wurden zuerst von ChatGPT/CoPilot geschrieben aber aufgrund falscher logik musste ich sie größtenteils anpassen
         it "Test 1: builds an empty board" $ do
             let fen = ",,,,,/,,,,,/,,,,,/,,,,,/,,,,,/,,,,,"
             let expectedBoard = replicate 6 (replicate 6 Empty)
@@ -162,7 +156,6 @@ main = hspec $ do
             buildBoard fen `shouldBe` expectedBoard
 
         describe "path" $ do
-        -- Diese Test-Cases wurden zuerst von ChatGPT/CoPilot geschrieben aber aufgrund falscher logik musste ich sie größtenteils anpassen
             it "Test 1: generates a path from a1 to the east for 2 steps" $
                 path (Pos 'a' 1) East 2 `shouldBe` [Pos 'a' 1, Pos 'b' 1, Pos 'c' 1]
 
@@ -235,8 +228,6 @@ main = hspec $ do
             it "Test 23: generates a path from a4 to the north west for 6 steps (reflects off the edge)" $
                 path (Pos 'a' 4) NorthWest 6 `shouldNotBe` [Pos 'a' 4, Pos 'b' 5, Pos 'd' 6, Pos 'e' 5, Pos 'f' 4, Pos 'a' 3, Pos 'b' 2]
 
- -- Eq und Pos Unit Tests da Coverage sonst nicht 100% erreicht
- -- Von ChatGPT geschrieben
         describe "Pos" $ do
             it "should correctly innit Pos values" $ do
                 let position = Pos 'c' 4
@@ -269,7 +260,6 @@ main = hspec $ do
                 Empty `shouldNotBe` Stack [Red]
 
         describe "playerWon" $ do
-        -- Diese Test-Cases wurden zuerst von ChatGPT/CoPilot geschrieben aber aufgrund falscher logik musste ich sie an paar Stellen anpassen
             it "returns Just Red when all stacks top with Red" $ do
                 let board = replicate 6 (replicate 6 (Stack [Red]))
                 playerWon board `shouldBe` Just Red
@@ -343,7 +333,6 @@ main = hspec $ do
 
         describe "possibleMoves" $ do
 
-        -- -- Diese Test-Cases wurden größtenteils von mir geschrieben das KI-generierte sehr fehlerhaft waren
             it "returns correct moves in list for five piece stack on f6" $ do
                     possibleMoves (Pos 'f' 6) (Stack [Red, Blue, Blue, Red, Blue]) `shouldMatchList`
                             ([Move (Pos 'f' 6) (Pos 'f' 5) 1, Move (Pos 'f' 6) (Pos 'e' 5) 1, Move (Pos 'f' 6) (Pos 'e' 6) 1,
@@ -395,7 +384,6 @@ main = hspec $ do
 
         describe "isValidMove" $ do
 
-        -- Diese Test-Cases wurden größtenteils von mir geschrieben das KI-generierte sehr fehlerhaft waren
             it "returns True for given board state and move" $ do
                 let gameBoard = [[Empty,Empty,Empty,Empty,Stack [Blue,Blue,Blue,Blue],Empty],[Empty,Stack [Red,Red,Red,Red,Red,Red],Empty,Empty,Empty,Empty],
                         [Empty,Empty,Empty,Empty,Empty,Empty],[Empty,Stack [Blue,Blue,Blue,Blue,Blue],Empty,Stack [Red,Red,Red,Red],Empty,Stack [Blue]],
@@ -478,8 +466,6 @@ main = hspec $ do
                 isValidMove gameBoard move `shouldBe` True
 
         describe "listMoves" $ do
-
-        -- Diese Test-Cases wurden größtenteils von mir geschrieben das KI-generierte sehr fehlerhaft waren
 
             it "returns no Moves for Red because Blue won in given board state" $ do
                 let gameBoard = buildBoard "brr,brr,brr,brr,brr,brr/,,,,,/,,,,,/,,,,,/,,,,,/b,b,b,b,b,b"
@@ -574,7 +560,6 @@ main = hspec $ do
                     Move (Pos 'e' 2) (Pos 'a' 2) 4, Move (Pos 'e' 2) (Pos 'a' 6) 4] :: [Move]) 
 
 
-        -- Test Cases von ChatGPT geschrieben
         describe "show for Move" $ do
             it "returns correct string representation for Move" $ do
                 show (Move (Pos 'a' 1) (Pos 'b' 2) 3) `shouldBe` "a1-3-b2"

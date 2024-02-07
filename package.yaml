@@ -1,7 +1,6 @@
 name:                deathstacks
 version:             1.0.0.0
-author:              "Simon Schwan"
-maintainer:          "s.schwan@tu-berlin.de"
+author:              "Emin Bayat"
 copyright:           "2023 TU Berlin - Software and Embedded Systems Engineering (SESE)"
 
 dependencies:

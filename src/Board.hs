@@ -1,15 +1,6 @@
-module Board where  -- do NOT CHANGE export of module
+module Board where
 
--- IMPORTS HERE
--- Note: Imports allowed that DO NOT REQUIRE TO ANY CHANGES TO package.yaml, e.g.:
---       import Data.Chars
 import Data.List.Split (splitOn)
-
--- #############################################################################
--- ############# GIVEN IMPLEMENTATION                           ################
--- ############# Note: "deriving Show" may be deleted if needed ################
--- #############       Given data types may NOT be changed      ################
--- #############################################################################
 
 data Player = Red | Blue deriving Show
 data Cell =  Stack [Player] | Empty deriving Show
@@ -30,30 +21,14 @@ instance Eq Cell where
   (==) (Stack xs) (Stack ys) = xs == ys
   (==) _ _ = False
 
-
--- #############################################################################
--- ################# IMPLEMENT validateFEN :: String -> Bool ###################
--- ################## - 2 Functional Points                  ###################
--- ################## - 1 Coverage Point                     ###################
--- #############################################################################
-
 validateFEN :: String -> Bool
--- von CoPilot Geschrieben
 validateFEN str =
   let isAllowed = (`elem` "rb,/")
       rows = splitOn "/" str
       correctCommas = all ((== 5) . length . filter (== ',')) rows
   in not (not (all isAllowed str) || (length rows /= 6) || last str == '/' || not correctCommas)
 
-
--- #############################################################################
--- ####################### buildBoard :: String -> Board #######################
--- ####################### - 2 Functional Points         #######################
--- ####################### - 1 Coverage Point            #######################
--- #############################################################################
-
 buildBoard :: String -> Board
--- von CoPilot Geschrieben
 buildBoard fen =
   let rows = splitOn "/" fen
       buildRow row = map buildCell (splitOn "," row)
@@ -65,15 +40,7 @@ buildBoard fen =
         'b' -> Blue
   in map buildRow rows
 
-
--- #############################################################################
--- #################### path :: Pos -> Dir -> Int -> [Pos]  ####################
--- #################### - 4 Functional Points               ####################
--- #################### - 1 Coverage Point                  ####################
--- #############################################################################
-
 path :: Pos -> Dir -> Int -> [Pos]
--- von CoPilot Geschrieben aber reflect und opposite von mir angepasst
 path startPos dir steps = map fst $ take (steps + 1) $ iterate moveReflect (startPos, dir)
   where
     moveReflect (pos, dir) = 
